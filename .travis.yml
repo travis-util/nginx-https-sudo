@@ -33,6 +33,7 @@ script:
 - curlw http://localhost
 - curlw --insecure https://localhost
 - curlw https://localhost
+- openssl s_client -connect localhost:443
 
 
 after_script:
