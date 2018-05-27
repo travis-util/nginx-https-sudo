@@ -36,10 +36,11 @@ install:
 script:
 - service nginx status
 - curlw http://localhost
-- curlw   https://localhost
+- curlw  --insecure https://localhost
 - curlw --cacert ~/certs/selfsigned.crt https://localhost
 - env CURL_CA_BUNDLE=~/certs/selfsigned.crt curl --connect-timeout 3 https://localhost | w3m -dump -T text/html
 - echo cacert=~/certs/selfsigned.crt | curl --config - --connect-timeout 3 https://localhost | w3m -dump -T text/html
+#^ This is more about curl than nginx!
 
 - curlw https://localhost
 
