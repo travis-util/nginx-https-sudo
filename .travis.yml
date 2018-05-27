@@ -37,11 +37,11 @@ script:
 - env CURL_CA_BUNDLE=/root/certs/default/selfsigned.crt curl --connect-timeout 3 https://localhost | w3m -dump -T text/html
 - env CURL_CA_BUNDLE=/root/certs/default curl --cacert selfsigned.crt --connect-timeout 3 https://localhost | w3m -dump -T text/html
 - curlw https://localhost
-- w3m -dump https://localhost
 
 
 after_script:
 - openssl s_client -connect localhost:443 | head --lines=11
+- w3m -dump https://localhost & w3mpid=$! ; sleep 1 ; kill $w3mpid
 - man nginx
 - nginx -V
 - dpkg --listfiles nginx
