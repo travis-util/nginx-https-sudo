@@ -44,12 +44,14 @@ script:
 
 - curlw https://localhost
 
+- curlw https://$ipeth0 --cacert ~/certs/selfsigned.crt
+
 
 after_script:
 - openssl s_client -connect localhost:443 | head --lines=8
 - w3m -dump https://localhost & w3mpid=$! ; sleep 1 ; kill $w3mpid
 - file ~/certs/selfsigned.crt
-- file /root/certs/default/selfsigned.crt /root/certs/default/selfsigned.key
+- sudo file /root/certs/default/selfsigned.crt /root/certs/default/selfsigned.key
 - man nginx
 - nginx -V
 - dpkg --listfiles nginx
@@ -71,7 +73,6 @@ after_script:
 - curlw $ipeth0
 - curlw https://$ipeth0
 - curlw https://$ipeth0 --insecure
-- curlw https://$ipeth0 --cacert ~/certs/selfsigned.crt
 - ping1 $icanh
 - curlw $icanh
 
