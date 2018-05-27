@@ -32,6 +32,7 @@ script:
 - service nginx status
 - curlw http://localhost
 - curlw --insecure https://localhost
+- curlw --cacert /root/certs/default/selfsigned.crt https://localhost
 - curlw https://localhost
 
 
