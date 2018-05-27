@@ -33,10 +33,10 @@ script:
 - curlw http://localhost
 - curlw --insecure https://localhost
 - curlw https://localhost
-- openssl s_client -connect localhost:443
 
 
 after_script:
+- openssl s_client -connect localhost:443 | head --lines=-16
 - man nginx
 - nginx -V
 - dpkg --listfiles nginx
