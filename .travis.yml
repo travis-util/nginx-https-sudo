@@ -36,7 +36,7 @@ install:
 script:
 - service nginx status
 - curlw http://localhost
-- curlw --insecure https://localhost
+- curlw   https://localhost
 - curlw --cacert ~/certs/selfsigned.crt https://localhost
 - env CURL_CA_BUNDLE=~/certs/selfsigned.crt curl --connect-timeout 3 https://localhost | w3m -dump -T text/html
 - echo cacert=~/certs/selfsigned.crt | curl --config - --connect-timeout 3 https://localhost | w3m -dump -T text/html
@@ -65,11 +65,14 @@ after_script:
 - ps -C nginx
 - ls -A --color /var/www
 - man curl
-- ping1 $icanh
-- curlw $icanh
+
 - ping1 $ipeth0
 - curlw $ipeth0
-
+- curlw https://$ipeth0
+- curlw https://$ipeth0 --insecure
+- curlw https://$ipeth0 --cacert ~/certs/selfsigned.crt
+- ping1 $icanh
+- curlw $icanh
 
 #- curlw --capath ~/certs --cacert selfsigned.crt https://localhost
 - curlw --capath ~/certs https://localhost
