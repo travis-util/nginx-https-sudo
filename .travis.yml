@@ -31,6 +31,7 @@ install:
 script:
 - service nginx status
 - curlw http://localhost
+- curlw --insecure https://localhost
 - curlw https://localhost
 
 
