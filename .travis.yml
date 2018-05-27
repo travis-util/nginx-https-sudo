@@ -33,8 +33,9 @@ script:
 - curlw http://localhost
 - curlw --insecure https://localhost
 - curlw --cacert /root/certs/default/selfsigned.crt https://localhost
-- env CURL_CA_BUNDLE=/root/certs/default/selfsigned.crt curlw --cacert selfsigned.crt https://localhost
-- env CURL_CA_BUNDLE=/root/certs/default curlw https://localhost
+- curlw --capath /root/certs/default --cacert selfsigned.crt https://localhost
+- env CURL_CA_BUNDLE=/root/certs/default/selfsigned.crt curl --connect-timeout 3 https://localhost | w3m -dump -T text/html
+- env CURL_CA_BUNDLE=/root/certs/default curl --cacert selfsigned.crt --connect-timeout 3 https://localhost | w3m -dump -T text/html
 - curlw https://localhost
 - w3m -dump https://localhost
 
