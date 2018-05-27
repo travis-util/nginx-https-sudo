@@ -1,0 +1,56 @@
+sudo: true
+
+env:
+- PS_FORMAT=user,pid,ppid,nlwp,%mem,args
+
+before_install:
+- sudo aptitude update -Z
+- sudo aptitude install nginx -Z --assume-yes && ps -C nginx
+- pip install --user pexpect
+
+- curlw () { curl --connect-timeout 3 $@ | w3m -dump -T text/html ; }
+- ping1 () { ping -c 1 $@ ; }
+- icanh=$(curl http://icanhazip.com)
+- ipeth0=$(ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//' | head --lines=1)
+
+
+install:
+- install --directory private
+# - openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout private/selfsigned.key -out selfsigned.crt
+- python openssl-req-pexpect.py
+- chmod u+r,u-wx,g-rwx,o-rwx private/selfsigned.key # Could be made in pexpect, directory could also be protected.
+# - openssl dhparam -out dhparam.pem 2048
+- sudo install --directory /root/certs/default
+- sudo mv selfsigned.crt private/selfsigned.key /root/certs/default
+
+- sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.orig
+- sudo cp .nginx-default /etc/nginx/sites-available/default
+- sudo service nginx restart && ps -C nginx
+
+
+script:
+- service nginx status
+- curlw http://localhost
+- curlw https://localhost
+
+
+after_script:
+- man nginx
+- nginx -V
+- dpkg --listfiles nginx
+- dpkg --listfiles nginx-common
+- dpkg --listfiles nginx-core
+- ls --color --recursive /etc/nginx
+- cat /etc/nginx/nginx.conf
+- cat /etc/nginx/sites-available/default
+- grep 'server_name.*;$' /etc/nginx/sites-available/*
+- cat /etc/default/nginx
+- ls --color /usr/share/nginx/html
+- w3m -dump /usr/share/nginx/html/index.html
+- w3m -dump /usr/share/nginx/html/50x.html
+- ps -C nginx
+- ls -A --color /var/www
+- ping1 $icanh
+- curlw $icanh
+- ping1 $ipeth0
+- curlw $ipeth0
