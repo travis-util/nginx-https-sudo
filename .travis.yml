@@ -9,6 +9,7 @@ before_install:
 - pip install --user pexpect
 
 - curlw () { curl --connect-timeout 3 $@ | w3m -dump -T text/html ; }
+# Use tmpfile to be sure that curlw fails when curl fails (function needs to be rewritten)!
 - ping1 () { ping -c 1 $@ ; }
 - icanh=$(curl http://icanhazip.com)
 - ipeth0=$(ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//' | head --lines=1)
@@ -37,11 +38,7 @@ script:
 - curlw http://localhost
 - curlw --insecure https://localhost
 - curlw --cacert ~/certs/selfsigned.crt https://localhost
-#- curlw --capath ~/certs --cacert selfsigned.crt https://localhost
-- curlw --capath ~/certs https://localhost
 - env CURL_CA_BUNDLE=~/certs/selfsigned.crt curl --connect-timeout 3 https://localhost | w3m -dump -T text/html
-#- env CURL_CA_BUNDLE=~/certs curl --cacert selfsigned.crt --connect-timeout 3 https://localhost | w3m -dump -T text/html
-- env CURL_CA_BUNDLE=~/certs curl --connect-timeout 3 https://localhost | w3m -dump -T text/html
 - echo cacert=~/certs/selfsigned.crt | curl --config - --connect-timeout 3 https://localhost | w3m -dump -T text/html
 
 - curlw https://localhost
@@ -67,7 +64,21 @@ after_script:
 - w3m -dump /usr/share/nginx/html/50x.html
 - ps -C nginx
 - ls -A --color /var/www
+- man curl
 - ping1 $icanh
 - curlw $icanh
 - ping1 $ipeth0
 - curlw $ipeth0
+
+
+#- curlw --capath ~/certs --cacert selfsigned.crt https://localhost
+- curlw --capath ~/certs https://localhost
+#^ Not working probably because directory has not been processed by c_rehash.
+- c_rehash ~/certs
+- ls --color ~/certs
+- curlw --capath ~/certs https://localhost
+- man c_rehash
+
+#- env CURL_CA_BUNDLE=~/certs curl --cacert selfsigned.crt --connect-timeout 3 https://localhost | w3m -dump -T text/html
+- env CURL_CA_BUNDLE=~/certs curl --connect-timeout 3 https://localhost | w3m -dump -T text/html
+# CURL_CA_BUNDLE seems to be for files, not directories!
