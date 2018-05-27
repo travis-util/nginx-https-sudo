@@ -1,0 +1,47 @@
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server ipv6only=on;
+
+        root /usr/share/nginx/html;
+        index index.html index.htm; # index.php
+
+        server_name _;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        error_page 404 /404.html;
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root /usr/share/nginx/html;
+        }
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        # No PHP in this config
+}
+
+
+# HTTPS server
+
+server {
+        listen 443;
+        server_name _;
+
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+
+        ssl on;
+        ssl_certificate /root/certs/default/selfsigned.crt;
+        ssl_certificate_key /root/certs/default/selfsigned.key;
+
+        ssl_session_timeout 5m;
+
+        ssl_protocols TLSv1.1 TLSv1.2; # SSLv3 TLSv1
+        ssl_ciphers "HIGH:!aNULL:!MD5:!3DES"; # Other values may be possible
+        ssl_prefer_server_ciphers on;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+}
