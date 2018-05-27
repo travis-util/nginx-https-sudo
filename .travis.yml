@@ -37,9 +37,11 @@ script:
 - curlw http://localhost
 - curlw --insecure https://localhost
 - curlw --cacert ~/certs/selfsigned.crt https://localhost
-- curlw --capath ~/certs --cacert selfsigned.crt https://localhost
+#- curlw --capath ~/certs --cacert selfsigned.crt https://localhost
+- curlw --capath ~/certs https://localhost
 - env CURL_CA_BUNDLE=~/certs/selfsigned.crt curl --connect-timeout 3 https://localhost | w3m -dump -T text/html
-- env CURL_CA_BUNDLE=~/certs curl --cacert selfsigned.crt --connect-timeout 3 https://localhost | w3m -dump -T text/html
+#- env CURL_CA_BUNDLE=~/certs curl --cacert selfsigned.crt --connect-timeout 3 https://localhost | w3m -dump -T text/html
+- env CURL_CA_BUNDLE=~/certs curl --connect-timeout 3 https://localhost | w3m -dump -T text/html
 - echo cacert=~/certs/selfsigned.crt | curl --config - --connect-timeout 3 https://localhost | w3m -dump -T text/html
 
 - curlw https://localhost
@@ -48,7 +50,8 @@ script:
 after_script:
 - openssl s_client -connect localhost:443 | head --lines=8
 - w3m -dump https://localhost & w3mpid=$! ; sleep 1 ; kill $w3mpid
-- file /root/certs/default/selfsigned.crt
+- file ~/certs/selfsigned.crt
+- file /root/certs/default/selfsigned.crt /root/certs/default/selfsigned.key
 - man nginx
 - nginx -V
 - dpkg --listfiles nginx
